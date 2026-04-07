@@ -7,9 +7,19 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #111; color: #eee; font-family: monospace; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
 
-    #stats-bar { background: #1a1a1a; border-bottom: 1px solid #333; padding: 6px 12px; display: flex; flex-wrap: wrap; gap: 16px; font-size: 11px; flex-shrink: 0; }
-    .stat-item { color: #aaa; }
-    .stat-item span { color: #7df; font-weight: bold; }
+    #stats-bar { background: #1a1a1a; border-bottom: 1px solid #333; flex-shrink: 0; }
+    #stats-header { padding: 5px 12px; display: flex; align-items: center; gap: 16px; font-size: 11px; cursor: pointer; user-select: none; }
+    #stats-header:hover { background: #222; }
+    #stats-toggle { color: #555; font-size: 10px; margin-left: auto; }
+    .stat-pill { color: #aaa; white-space: nowrap; }
+    .stat-pill span { color: #7df; font-weight: bold; }
+    #stats-detail { display: none; padding: 8px 12px; border-top: 1px solid #222; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px 20px; }
+    #stats-detail.hidden { display: none; }
+    .stat-group { }
+    .stat-group h4 { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; border-bottom: 1px solid #2a2a2a; padding-bottom: 2px; }
+    .stat-row { font-size: 10px; color: #888; display: flex; justify-content: space-between; gap: 6px; margin: 1px 0; }
+    .stat-row .val { color: #7df; font-weight: bold; }
+    .stat-row .range { color: #555; font-size: 9px; }
 
     #main { display: flex; flex: 1; overflow: hidden; }
     #map-panel { flex: 1; display: flex; flex-direction: column; }
@@ -50,18 +60,55 @@
 <body>
 
 <div id="stats-bar">
-  <div class="stat-item">Plants: <span id="s-total">—</span></div>
-  <div class="stat-item">Avg Health: <span id="s-health">—</span></div>
-  <div class="stat-item">Avg Age: <span id="s-age">—</span></div>
-  <div class="stat-item">Avg Energy: <span id="s-energy">—</span></div>
-  <div class="stat-item">Avg Root Depth: <span id="s-root">—</span></div>
-  <div class="stat-item">Avg Leaf Size: <span id="s-leaf">—</span></div>
-  <div class="stat-item">Avg Height: <span id="s-height">—</span></div>
-  <div class="stat-item">Avg Water Need: <span id="s-water">—</span></div>
-  <div class="stat-item">Avg Sun Need: <span id="s-sun">—</span></div>
-  <div class="stat-item">Avg Lifespan: <span id="s-lifespan">—</span></div>
-  <div class="stat-item">Avg Growth Speed: <span id="s-growth">—</span></div>
-  <div class="stat-item">Avg Temp Resilience: <span id="s-tempres">—</span></div>
+  <div id="stats-header">
+    <div class="stat-pill">Tick: <span id="s-tick">0</span></div>
+    <div class="stat-pill">Plants: <span id="s-total">—</span></div>
+    <div class="stat-pill">Mature: <span id="s-mature">—</span></div>
+    <div class="stat-pill">Health: <span id="s-health">—</span></div>
+    <div class="stat-pill">Avg Age: <span id="s-age">—</span></div>
+    <div class="stat-pill">Energy: <span id="s-energy">—</span></div>
+    <div id="stats-toggle">▼ more</div>
+  </div>
+  <div id="stats-detail" class="hidden">
+    <div class="stat-group">
+      <h4>Population</h4>
+      <div class="stat-row"><span>Total</span><span class="val" id="sd-total">—</span></div>
+      <div class="stat-row"><span>Mature</span><span class="val" id="sd-mature">—</span></div>
+      <div class="stat-row"><span>Avg Age</span><span class="val" id="sd-age">—</span></div>
+      <div class="stat-row"><span>Max Age</span><span class="val" id="sd-maxage">—</span></div>
+      <div class="stat-row"><span>Avg Health</span><span class="val" id="sd-health">—</span> <span class="range" id="sd-health-min">—</span></div>
+      <div class="stat-row"><span>Avg Energy</span><span class="val" id="sd-energy">—</span></div>
+    </div>
+    <div class="stat-group">
+      <h4>Structure</h4>
+      <div class="stat-row"><span>Height</span><span class="val" id="sd-height">—</span> <span class="range" id="sd-height-range">—</span></div>
+      <div class="stat-row"><span>Leaf Size</span><span class="val" id="sd-leaf">—</span> <span class="range" id="sd-leaf-range">—</span></div>
+      <div class="stat-row"><span>Growth Speed</span><span class="val" id="sd-growth">—</span></div>
+      <div class="stat-row"><span>Maturity Age</span><span class="val" id="sd-maturity">—</span></div>
+      <div class="stat-row"><span>Lifespan</span><span class="val" id="sd-lifespan">—</span></div>
+      <div class="stat-row"><span>Energy Storage</span><span class="val" id="sd-storage">—</span></div>
+    </div>
+    <div class="stat-group">
+      <h4>Resources</h4>
+      <div class="stat-row"><span>Water Need</span><span class="val" id="sd-water">—</span> <span class="range" id="sd-water-range">—</span></div>
+      <div class="stat-row"><span>Sun Need</span><span class="val" id="sd-sun">—</span> <span class="range" id="sd-sun-range">—</span></div>
+      <div class="stat-row"><span>Nutrition Need</span><span class="val" id="sd-nutrition">—</span></div>
+      <div class="stat-row"><span>Root Depth</span><span class="val" id="sd-root">—</span> <span class="range" id="sd-root-range">—</span></div>
+    </div>
+    <div class="stat-group">
+      <h4>Reproduction</h4>
+      <div class="stat-row"><span>Seed Distrib.</span><span class="val" id="sd-seeddist">—</span></div>
+      <div class="stat-row"><span>Seed Hardiness</span><span class="val" id="sd-seedhard">—</span></div>
+      <div class="stat-row"><span>Repro. Time</span><span class="val" id="sd-reprotime">—</span></div>
+      <div class="stat-row"><span>Spread</span><span class="val" id="sd-spread">—</span></div>
+      <h4 style="margin-top:8px">Adaptation</h4>
+      <div class="stat-row"><span>Best Temp</span><span class="val" id="sd-besttemp">—</span></div>
+      <div class="stat-row"><span>Temp Resilience</span><span class="val" id="sd-tempres">—</span></div>
+      <div class="stat-row"><span>Toughness</span><span class="val" id="sd-tough">—</span></div>
+      <div class="stat-row"><span>Toxicity</span><span class="val" id="sd-tox">—</span></div>
+      <div class="stat-row"><span>Thorniness</span><span class="val" id="sd-thorn">—</span></div>
+    </div>
+  </div>
 </div>
 
 <div id="main">
@@ -96,7 +143,6 @@
           <option value="100,200">100x</option>
         </select>
       </label>
-      <span id="tick-count" style="font-size:12px;color:#888">Tick: 0</span>
     </div>
     <div id="map-3d"></div>
   </div>
@@ -273,21 +319,56 @@ async function fetchState() {
   buildGrid(worldData);
 }
 
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val ?? '—'; }
+
 async function fetchStats() {
   const res = await fetch('/stats');
   const s   = await res.json();
-  document.getElementById('s-total').textContent    = s.total_plants ?? '—';
-  document.getElementById('s-health').textContent   = s.avg_health   ?? '—';
-  document.getElementById('s-age').textContent      = s.avg_age      ?? '—';
-  document.getElementById('s-energy').textContent   = s.avg_energy   ?? '—';
-  document.getElementById('s-root').textContent     = s.avg_root_depth ?? '—';
-  document.getElementById('s-leaf').textContent     = s.avg_leaf_size  ?? '—';
-  document.getElementById('s-height').textContent   = s.avg_height     ?? '—';
-  document.getElementById('s-water').textContent    = s.avg_water_need ?? '—';
-  document.getElementById('s-sun').textContent      = s.avg_sun_need   ?? '—';
-  document.getElementById('s-lifespan').textContent = s.avg_lifespan   ?? '—';
-  document.getElementById('s-growth').textContent   = s.avg_growth_speed ?? '—';
-  document.getElementById('s-tempres').textContent  = s.avg_temperature_resilience ?? '—';
+
+  // Summary bar
+  set('s-tick',   s.tick);
+  set('s-total',  s.total_plants);
+  set('s-mature', s.mature_plants);
+  set('s-health', s.avg_health);
+  set('s-age',    s.avg_age);
+  set('s-energy', s.avg_energy);
+
+  // Detail panel
+  set('sd-total',   s.total_plants);
+  set('sd-mature',  s.mature_plants);
+  set('sd-age',     s.avg_age);
+  set('sd-maxage',  s.max_age);
+  set('sd-health',  s.avg_health);
+  set('sd-health-min', s.min_health != null ? `min ${s.min_health}` : '');
+  set('sd-energy',  s.avg_energy);
+
+  set('sd-height',       s.avg_height);
+  set('sd-height-range', s.min_height != null ? `${s.min_height}–${s.max_height}` : '');
+  set('sd-leaf',         s.avg_leaf_size);
+  set('sd-leaf-range',   s.min_leaf != null ? `${s.min_leaf}–${s.max_leaf}` : '');
+  set('sd-growth',   s.avg_growth_speed);
+  set('sd-maturity', s.avg_maturity_age);
+  set('sd-lifespan', s.avg_lifespan);
+  set('sd-storage',  s.avg_energy_storage);
+
+  set('sd-water',       s.avg_water_need);
+  set('sd-water-range', s.min_water != null ? `${s.min_water}–${s.max_water}` : '');
+  set('sd-sun',         s.avg_sun_need);
+  set('sd-sun-range',   s.min_sun != null ? `${s.min_sun}–${s.max_sun}` : '');
+  set('sd-nutrition', s.avg_nutrition_need);
+  set('sd-root',      s.avg_root_depth);
+  set('sd-root-range', s.min_root != null ? `${s.min_root}–${s.max_root}` : '');
+
+  set('sd-seeddist', s.avg_seed_distribution);
+  set('sd-seedhard', s.avg_seed_hardiness);
+  set('sd-reprotime',s.avg_reproduction_time);
+  set('sd-spread',   s.avg_spread);
+
+  set('sd-besttemp', s.avg_best_temperature);
+  set('sd-tempres',  s.avg_temperature_resilience);
+  set('sd-tough',    s.avg_toughness);
+  set('sd-tox',      s.avg_toxicity);
+  set('sd-thorn',    s.avg_thorniness);
 }
 
 function getSpeed() {
@@ -300,10 +381,7 @@ let playInterval = null;
 
 async function doTick() {
   const { n } = getSpeed();
-  const res  = await fetch(`/ticks/${n}`, { method: 'POST' });
-  const data = await res.json();
-  tickCount  = data.tick;
-  document.getElementById('tick-count').textContent = `Tick: ${tickCount}`;
+  await fetch(`/ticks/${n}`, { method: 'POST' });
   await Promise.all([fetchState(), fetchStats()]);
 }
 
@@ -392,6 +470,7 @@ window.showLineage = async function(plantId) {
       <strong>${label} — ID ${p.id}</strong><br>
       Born tick ${p.born_tick} · ${status}<br>
       Tile (${p.birth_tile[0]}, ${p.birth_tile[1]})
+      <button onclick="event.stopPropagation();showPlantStats(${p.id},${p.birth_tile[0]},${p.birth_tile[1]})" style="font-size:9px;padding:1px 5px;margin-top:3px;display:block">Stats</button>
     </div>`;
   }
 
@@ -416,6 +495,37 @@ window.showLineage = async function(plantId) {
 // -----------------------------------------------------------------------
 // Controls
 // -----------------------------------------------------------------------
+// Stats panel toggle
+document.getElementById('stats-header').addEventListener('click', () => {
+  const panel  = document.getElementById('stats-detail');
+  const toggle = document.getElementById('stats-toggle');
+  const hidden = panel.classList.toggle('hidden');
+  toggle.textContent = hidden ? '▼ more' : '▲ less';
+});
+
+// -----------------------------------------------------------------------
+// Plant stats from lineage panel
+// -----------------------------------------------------------------------
+window.showPlantStats = async function(plantId, tx, ty) {
+  const res = await fetch(`/tile/${tx}/${ty}`);
+  if (!res.ok) return;
+  const data = await res.json();
+  const plant = data.plants.find(p => p.plant_id === plantId);
+  if (!plant) {
+    // Plant is dead — show birth traits from registry
+    const linRes = await fetch(`/lineage/${plantId}`);
+    if (!linRes.ok) return;
+    const lin = await linRes.json();
+    const traitHTML = Object.entries(lin.plant.traits)
+      .map(([k, v]) => `<div class="trait">${k}: <span>${v}</span></div>`).join('');
+    document.getElementById('tile-detail').innerHTML =
+      `<div class="plant-card"><div class="plant-title">Plant ID ${plantId} (deceased — birth traits)</div>
+       <div class="trait-grid">${traitHTML}</div></div>`;
+    return;
+  }
+  renderSidebar({ x: tx, y: ty, environment: data.environment, plants: [plant] });
+};
+
 document.getElementById('btn-tick').addEventListener('click', doTick);
 
 function startPlay() {
@@ -445,7 +555,7 @@ document.getElementById('btn-restart').addEventListener('click', async () => {
   }
   await fetch('/restart', { method: 'POST' });
   tickCount = 0;
-  document.getElementById('tick-count').textContent = 'Tick: 0';
+  document.getElementById('s-tick').textContent = '0';
   document.getElementById('tile-detail').innerHTML  = '<div id="no-selection">Click a tile to inspect it.</div>';
   document.getElementById('lineage-panel').style.display = 'none';
   await Promise.all([fetchState(), fetchStats()]);

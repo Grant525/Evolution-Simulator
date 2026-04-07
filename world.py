@@ -282,25 +282,58 @@ class World:
         ]
         n = len(all_plants)
         if n == 0:
-            return {"total_plants": 0}
+            return {"total_plants": 0, "tick": self.tick_count}
 
         def avg(attr):
             return round(sum(getattr(p, attr) for p in all_plants) / n, 3)
 
+        def mn(attr):
+            return round(min(getattr(p, attr) for p in all_plants), 3)
+
+        def mx(attr):
+            return round(max(getattr(p, attr) for p in all_plants), 3)
+
+        mature_count = sum(1 for p in all_plants if p.is_mature)
+
         return {
-            "total_plants":           n,
-            "avg_health":             avg("health"),
-            "avg_age":                round(sum(p.age for p in all_plants) / n, 1),
-            "avg_energy":             round(sum(p.energy for p in all_plants) / n, 1),
-            "avg_root_depth":         avg("root_depth"),
-            "avg_leaf_size":          avg("leaf_size"),
-            "avg_height":             avg("potential_height"),
-            "avg_water_need":         avg("water_need"),
-            "avg_sun_need":           avg("sun_need"),
+            "tick":            self.tick_count,
+            "total_plants":    n,
+            "mature_plants":   mature_count,
+
+            # Runtime state
+            "avg_health":      avg("health"),  "min_health":  mn("health"),
+            "avg_age":         round(sum(p.age for p in all_plants) / n, 1),
+            "max_age":         max(p.age for p in all_plants),
+            "avg_energy":      round(sum(p.energy for p in all_plants) / n, 1),
+
+            # Growth / structure
+            "avg_height":      avg("potential_height"),  "min_height": mn("potential_height"), "max_height": mx("potential_height"),
+            "avg_leaf_size":   avg("leaf_size"),          "min_leaf":   mn("leaf_size"),        "max_leaf":   mx("leaf_size"),
+            "avg_growth_speed":avg("growth_speed"),
+            "avg_maturity_age":avg("maturity_age"),
+            "avg_lifespan":    avg("lifespan"),
+
+            # Resources
+            "avg_water_need":  avg("water_need"),   "min_water": mn("water_need"),  "max_water": mx("water_need"),
+            "avg_sun_need":    avg("sun_need"),      "min_sun":   mn("sun_need"),    "max_sun":   mx("sun_need"),
+            "avg_nutrition_need": avg("nutrition_need"),
+            "avg_root_depth":  avg("root_depth"),   "min_root":  mn("root_depth"),  "max_root":  mx("root_depth"),
+            "avg_energy_storage": avg("energy_storage"),
+
+            # Reproduction
             "avg_seed_distribution":  avg("seed_distribution"),
-            "avg_lifespan":           avg("lifespan"),
-            "avg_growth_speed":       avg("growth_speed"),
+            "avg_seed_hardiness":     avg("seed_hardiness"),
+            "avg_reproduction_time":  avg("reproduction_time"),
+            "avg_spread":             avg("spread"),
+
+            # Environment adaptation
+            "avg_best_temperature":       avg("best_temperature"),
             "avg_temperature_resilience": avg("temperature_resilience"),
+
+            # Defenses
+            "avg_toughness":   avg("toughness"),
+            "avg_toxicity":    avg("toxicity"),
+            "avg_thorniness":  avg("thorniness"),
         }
 
     def tile_detail(self, x, y):
